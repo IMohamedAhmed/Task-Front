@@ -1,20 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  List,
-  ListItemButton,
-  ListItemText,
-  Drawer,
-  Fab,
-  Modal,
-  CircularProgress,
-  Divider,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
@@ -26,7 +11,6 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(false);
   const [, setDetailsLoading] = useState(false);
 
-  const drawerWidth = 300;
   const drawerTopOffset = 64;
   const didFetch = useRef(false);
 
@@ -34,11 +18,6 @@ export default function ProjectsPage() {
     baseURL: import.meta.env.VITE_API_URL,
     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
   });
-
-  const commonInputStyles = {
-    "& .MuiInputLabel-root": { color: "#ccc" },
-    "& .MuiInputBase-input": { color: "#fff" },
-  };
 
   useEffect(() => {
     // Lock scrollbar
@@ -105,161 +84,92 @@ export default function ProjectsPage() {
   };
 
   return (
-    <Box
-      sx={{
-        height: "100vh",
-        display: "flex",
-        backgroundImage:
-          "linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2500&auto=format&fit=crop')",
-        backgroundSize: "cover",
-        gap: 0,
-        backgroundPosition: "center",
-        color: "#fff",
-        overflow: "hidden", // make absolutely sure Box itself doesn't overflow
-      }}
-    >
+    <div className="h-screen flex overflow-hidden text-white bg-gradient-to-br from-dark-950 via-secondary-900 to-neutral-900">
       {/* Sidebar */}
-      <Drawer
-        variant="permanent"
-        anchor="left"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-            bgcolor: "rgba(0,0,0,0.85)",
-            color: "#fff",
-            p: 2,
-            top: `${drawerTopOffset}px`,
-            height: `calc(100% - ${drawerTopOffset}px)`,
-          },
+      <div
+        className="w-80 flex-shrink-0 bg-neutral-900/90 border-r border-neutral-700/50 p-4 overflow-y-auto"
+        style={{
+          marginTop: `${drawerTopOffset}px`,
+          height: `calc(100vh - ${drawerTopOffset}px)`,
         }}
       >
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
-          My Projects
-        </Typography>
+        <h2 className="text-xl font-bold mb-4">My Projects</h2>
 
         {loading ? (
-          <CircularProgress size={28} sx={{ color: "#fff", mt: 2 }} />
+          <div className="flex justify-center mt-4">
+            <div className="animate-spin rounded-full h-7 w-7 border-b-2 border-white"></div>
+          </div>
         ) : projects.length === 0 ? (
-          <Typography variant="body2" sx={{ color: "gray", mt: 1 }}>
-            No projects yet
-          </Typography>
+          <p className="text-neutral-400 mt-2 text-sm">No projects yet</p>
         ) : (
-          <List>
+          <div className="space-y-2">
             {projects.map((project) => {
               const isSelected =
                 selectedProject && selectedProject._id === project._id;
               return (
-                <ListItemButton
+                <button
                   key={project._id}
                   onClick={() => handleSelectProject(project._id)}
-                  sx={{
-                    borderRadius: 1,
-                    mb: 0.5,
-                    transition: "all 0.25s ease",
-                    bgcolor: isSelected
-                      ? "rgba(255,255,255,0.15)"
-                      : "transparent",
-                    borderLeft: isSelected
-                      ? "4px solid #4f46e5"
-                      : "4px solid transparent",
-                    pl: isSelected ? 1 : 0,
-                    "&:hover": {
-                      bgcolor: "rgba(255,255,255,0.1)",
-                      transform: "translateX(4px)",
-                    },
-                  }}
+                  className={`w-full text-left p-3 rounded-lg transition-all duration-250 border-l-4 ${
+                    isSelected
+                      ? "bg-white/15 border-l-primary-600 pl-2"
+                      : "bg-transparent border-l-transparent hover:bg-white/10 hover:translate-x-1"
+                  }`}
                 >
-                  <ListItemText
-                    primary={project.name || "Untitled Project"}
-                    secondary={
-                      project.deadline
-                        ? `Due: ${new Date(project.deadline).toLocaleDateString(
-                            "en-US",
-                            { month: "short", day: "numeric", year: "numeric" }
-                          )}`
-                        : ""
-                    }
-                    sx={{
-                      "& .MuiListItemText-primary": {
-                        color: "#fff",
-                        fontWeight: 500,
-                      },
-                      "& .MuiListItemText-secondary": { color: "gray" },
-                    }}
-                  />
-                </ListItemButton>
+                  <div className="font-medium text-white">
+                    {project.name || "Untitled Project"}
+                  </div>
+                  {project.deadline && (
+                    <div className="text-sm text-neutral-400 mt-1">
+                      Due:{" "}
+                      {new Date(project.deadline).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </div>
+                  )}
+                </button>
               );
             })}
-          </List>
+          </div>
         )}
-      </Drawer>
+      </div>
 
       {/* Main Content */}
-      <Box
-        sx={{
-          flexGrow: 1,
-          ml: `20px`,
-          mt: `${drawerTopOffset}px`,
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-        }}
+      <div
+        className="flex-1 ml-5 flex flex-col overflow-hidden"
+        style={{ marginTop: `${drawerTopOffset}px` }}
       >
         {!selectedProject ? (
-          <Box
-            sx={{
-              flexGrow: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexDirection: "column",
-              textAlign: "center",
-            }}
-          >
-            <Typography variant="h4" sx={{ mb: 2, fontWeight: "bold" }}>
+          <div className="flex-1 flex items-center justify-center flex-col text-center">
+            <h1 className="text-4xl font-bold mb-4">
               Welcome to Your Project Dashboard
-            </Typography>
-            <Typography variant="body1" sx={{ color: "gray", maxWidth: 500 }}>
+            </h1>
+            <p className="text-neutral-400 max-w-lg">
               Select a project from the left or click the "+" button to create a
               new one.
-            </Typography>
-          </Box>
+            </p>
+          </div>
         ) : (
-          <Box
-            sx={{
-              flexGrow: 1,
-              overflowY: "auto",
-              p: 4,
-              bgcolor: "rgba(30,30,30,0.95)",
-              borderRadius: 3,
-              boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
-              mr: 3,
-              mt: 3,
-              mb: 10,
-            }}
-          >
-            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
-              {selectedProject.name}
-            </Typography>
-            <Typography variant="body2" sx={{ color: "gray", mb: 2 }}>
+          <div className="flex-1 overflow-y-auto p-6 bg-neutral-800/90 border border-neutral-700/50 rounded-xl shadow-2xl mr-6 mt-6 mb-20">
+            <h1 className="text-4xl font-bold mb-2">{selectedProject.name}</h1>
+            <p className="text-neutral-400 mb-4">
               Created:{" "}
               {new Date(selectedProject.createdAt).toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
                 year: "numeric",
               })}
-            </Typography>
-            <Divider sx={{ bgcolor: "rgba(255,255,255,0.1)", mb: 2 }} />
+            </p>
+            <hr className="border-white/10 mb-4" />
 
-            <Typography variant="body1" sx={{ mb: 2 }}>
+            <p className="mb-4">
               {selectedProject.description || "No description provided."}
-            </Typography>
+            </p>
 
             {selectedProject.deadline && (
-              <Typography variant="body1" sx={{ mb: 3 }}>
+              <p className="mb-6">
                 Deadline:{" "}
                 {new Date(selectedProject.deadline).toLocaleDateString(
                   "en-US",
@@ -269,156 +179,118 @@ export default function ProjectsPage() {
                     year: "numeric",
                   }
                 )}
-              </Typography>
+              </p>
             )}
 
-            <Typography variant="h5" sx={{ mt: 3, mb: 2, fontWeight: "bold" }}>
+            <h2 className="text-2xl font-bold mt-6 mb-4">
               Tasks ({selectedProject._tasks?.length || 0})
-            </Typography>
+            </h2>
 
             {!selectedProject._tasks || selectedProject._tasks.length === 0 ? (
-              <Typography variant="body2" sx={{ color: "gray" }}>
-                No tasks available.
-              </Typography>
+              <p className="text-neutral-400">No tasks available.</p>
             ) : (
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <div className="space-y-4">
                 {selectedProject._tasks.map((task) => {
-                  const priorityColor =
-                    task.priority === "high"
-                      ? "#ef4444"
-                      : task.priority === "medium"
-                      ? "#f59e0b"
-                      : "#10b981";
+                  const priorityColors = {
+                    high: "border-l-danger-500",
+                    medium: "border-l-warning-500",
+                    low: "border-l-success-500",
+                  };
+                  const priorityTextColors = {
+                    high: "text-danger-400",
+                    medium: "text-warning-400",
+                    low: "text-success-400",
+                  };
 
                   return (
-                    <Box
+                    <div
                       key={task._id}
-                      sx={{
-                        p: 2,
-                        borderRadius: 2,
-                        bgcolor: "rgba(255,255,255,0.07)",
-                        borderLeft: `4px solid ${priorityColor}`,
-                        transition: "transform 0.2s ease",
-                        "&:hover": { transform: "translateX(4px)" },
-                      }}
+                      className={`p-4 rounded-lg bg-white/5 border-l-4 transition-transform duration-200 hover:translate-x-1 ${
+                        priorityColors[task.priority] || priorityColors.low
+                      }`}
                     >
-                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                        {task.title}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ color: "gray", mb: 0.5 }}
-                      >
+                      <h3 className="text-lg font-semibold">{task.title}</h3>
+                      <p className="text-neutral-400 text-sm mb-2">
                         {task.description || "No description"}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: priorityColor,
-                          fontWeight: 500,
-                          textTransform: "capitalize",
-                        }}
+                      </p>
+                      <span
+                        className={`text-xs font-medium capitalize ${
+                          priorityTextColors[task.priority] ||
+                          priorityTextColors.low
+                        }`}
                       >
                         {task.status} • {task.priority} priority
-                      </Typography>
-                    </Box>
+                      </span>
+                    </div>
                   );
                 })}
-              </Box>
+              </div>
             )}
-          </Box>
+          </div>
         )}
-      </Box>
+      </div>
 
       {/* Floating Button */}
-      <Fab
-        color="primary"
-        sx={{
-          position: "fixed",
-          bottom: 32,
-          right: 32,
-          bgcolor: "#4f46e5",
-          "&:hover": { bgcolor: "#3730a3" },
-        }}
+      <button
+        className="fixed bottom-8 right-8 w-14 h-14 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center text-2xl font-bold"
         onClick={() => setOpenModal(true)}
       >
-        <AddIcon />
-      </Fab>
+        +
+      </button>
 
       {/* Modal */}
-      <Modal
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        aria-labelledby="create-project-modal"
-      >
-        <Box
-          component="form"
-          onSubmit={handleAddProject}
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "rgba(20,20,20,0.95)",
-            color: "#fff",
-            borderRadius: 3,
-            p: 4,
-            boxShadow: 24,
-            backdropFilter: "blur(6px)",
-          }}
-        >
-          <Typography id="create-project-modal" variant="h6" sx={{ mb: 2 }}>
-            Create New Project
-          </Typography>
-
-          <TextField
-            label="Project Name"
-            fullWidth
-            margin="normal"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            sx={commonInputStyles}
-          />
-
-          <TextField
-            label="Description"
-            fullWidth
-            margin="normal"
-            multiline
-            rows={3}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            sx={commonInputStyles}
-          />
-
-          <TextField
-            label="Due Date"
-            type="date"
-            fullWidth
-            margin="normal"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            sx={commonInputStyles}
-          />
-
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{
-              mt: 3,
-              py: 1.2,
-              bgcolor: "#4f46e5",
-              "&:hover": { bgcolor: "#3730a3" },
-              fontWeight: 600,
-            }}
+      {openModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <form
+            onSubmit={handleAddProject}
+            className="bg-neutral-800/95 backdrop-blur-md text-white border border-neutral-700/50 rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl"
           >
-            Add Project
-          </Button>
-        </Box>
-      </Modal>
-    </Box>
+            <h2 className="text-xl font-semibold mb-4">Create New Project</h2>
+
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Project Name"
+                className="w-full p-3 bg-white/10 text-white border border-white/30 rounded-lg placeholder-white/70 focus:outline-none focus:border-primary-500 transition-colors"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+
+              <textarea
+                placeholder="Description"
+                rows={3}
+                className="w-full p-3 bg-white/10 text-white border border-white/30 rounded-lg placeholder-white/70 focus:outline-none focus:border-primary-500 transition-colors resize-none"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+
+              <input
+                type="date"
+                className="w-full p-3 bg-white/10 text-white border border-white/30 rounded-lg focus:outline-none focus:border-primary-500 transition-colors"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => setOpenModal(false)}
+                className="flex-1 py-3 bg-neutral-600 hover:bg-neutral-700 text-white font-semibold rounded-lg transition-colors duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-1 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-colors duration-200"
+              >
+                Add Project
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </div>
   );
 }
