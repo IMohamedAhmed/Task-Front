@@ -1,9 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default function HomePage({ token }) {
+export default React.memo(function HomePage({ token }) {
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-gradient-to-br from-primary-950 via-secondary-950 to-dark-950 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-primary-950 via-secondary-950 to-dark-950 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0">
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary-600/10 rounded-full blur-3xl animate-float"></div>
@@ -12,7 +12,7 @@ export default function HomePage({ token }) {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-64px)] px-6 py-12">
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 py-12 pt-24">
         <div className="max-w-5xl mx-auto text-center">
           {/* Hero Section */}
           <div className="animate-slide-up">
@@ -61,14 +61,35 @@ export default function HomePage({ token }) {
 
           {/* CTA Section */}
           <div className="animate-slide-up" style={{ animationDelay: '0.4s' }}>
-            <Link
-              to={token ? "/projects" : "/login"}
-              className="group relative inline-flex items-center px-8 py-4 font-bold text-lg rounded-2xl bg-gradient-to-r from-primary-600 to-primary-700 text-white transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/25 animate-pulse-glow"
-            >
-              <span className="relative z-10">Get Started</span>
-              <span className="ml-2 text-xl group-hover:translate-x-1 transition-transform">→</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            </Link>
+            {token ? (
+              <Link
+                to="/projects"
+                className="group relative inline-flex items-center px-8 py-4 font-bold text-lg rounded-2xl bg-gradient-to-r from-primary-600 to-primary-700 text-white transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/25 animate-pulse-glow"
+              >
+                <span className="relative z-10">Go to Dashboard</span>
+                <span className="ml-2 text-xl group-hover:translate-x-1 transition-transform">→</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              </Link>
+            ) : (
+              <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+                <Link
+                  to="/register"
+                  className="group relative inline-flex items-center px-8 py-4 font-bold text-lg rounded-2xl bg-gradient-to-r from-primary-600 to-primary-700 text-white transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/25 animate-pulse-glow"
+                >
+                  <span className="relative z-10">Get Started Free</span>
+                  <span className="ml-2 text-xl group-hover:translate-x-1 transition-transform">→</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </Link>
+
+                <Link
+                  to="/login"
+                  className="group relative inline-flex items-center px-8 py-4 font-semibold text-lg rounded-2xl bg-transparent border-2 border-neutral-600 text-neutral-300 hover:border-primary-500 hover:text-white transition-all duration-300 hover:scale-105"
+                >
+                  <span className="relative z-10">Sign In</span>
+                  <span className="ml-2 text-xl group-hover:translate-x-1 transition-transform">→</span>
+                </Link>
+              </div>
+            )}
 
             <p className="mt-4 text-sm text-neutral-500">
               {token ? "Continue to your dashboard" : "Join thousands of productive users"}
@@ -78,4 +99,4 @@ export default function HomePage({ token }) {
       </div>
     </div>
   );
-}
+});
